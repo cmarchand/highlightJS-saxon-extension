@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<gaulois-services>
+  <saxon>
+    <extensions>
+      <function>top.marchand.xml.saxon.extension.highlight.HighlightExtension</function>
+    </extensions>
+  </saxon>
+</gaulois-services>

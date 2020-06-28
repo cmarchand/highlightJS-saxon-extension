@@ -34,18 +34,19 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
     private static final String JS_RESOURCE = "/top/marchand/xml/saxon/extension/highlight/highlight.min.js";
 
     private Context context;
-    private Value function;
+//    private Value function;
 
     public HighlightExtension() {
         super();
         try {
-        context.eval(
-            Source.newBuilder(
-                    JS, 
-                    new InputStreamReader(getClass().getResourceAsStream(JS_RESOURCE)),
-                    "highlight.min.js").build());
-        Value obj = context.getBindings(JS).getMember("hljs");
-        function = obj.getMember("highlight");
+            context = Context.create();
+            context.eval(
+                Source.newBuilder(
+                        JS, 
+                        new InputStreamReader(getClass().getResourceAsStream(JS_RESOURCE)),
+                        "highlight.min.js"
+                ).build()
+            );
         } catch(IOException ex) {
             ex.printStackTrace(System.err);
         }
@@ -79,6 +80,8 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
                     throw new XPathException(EXT_PREFIX+":"+EXT_FUNCTION_NAME+" first parameter language must not be empty");
                 }
                 String sourceCode = parameters[1].toString();
+                Value obj = context.getBindings(JS).getMember("hljs");
+                Value function = obj.getMember("highlight");
                 return new StringValue(
                         function.execute(language,sourceCode).getMember("value").asString()
                 );

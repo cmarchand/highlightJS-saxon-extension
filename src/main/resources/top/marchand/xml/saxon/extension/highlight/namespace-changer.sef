@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns='http://ns.saxonica.com/xslt/export' xmlns:fn='http://www.w3.org/2005/xpath-functions' xmlns:java-type='http://saxon.sf.net/java-type' xmlns:vv='http://saxon.sf.net/generated-variable' xmlns:xs='http://www.w3.org/2001/XMLSchema' when='2020-06-30T22:59:58.192215+02:00' id='0' version='30' packageVersion='1' saxonProduct='SAXON-EE' saxonVersion='10.0' buildDateTime='2020-06-30T22:59:58.192612+02:00' target='EE' targetVersion='1' relocatable='false' implicit='true'>
+ <co id='0' binds='1'>
+  <mode onNo='SC' flags='dW' patternSlots='0'>
+   <templateRule prec='0' prio='-0.5' seq='0' rank='0' minImp='0' slots='0' matches='NE' flags='s' line='18' module='file:/Users/cmarchand/devel/github/highligtJS-saxon-extension/src/main/xsl/top/marchand/xml/saxon/extension/highlight/namespace-changer.xsl'>
+    <p.nodeTest role='match' test='NE'/>
+    <compElem role='action' baseUri='file:/Users/cmarchand/devel/github/highligtJS-saxon-extension/src/main/xsl/top/marchand/xml/saxon/extension/highlight/namespace-changer.xsl' ns='math=~ xd=http://www.oxygenxml.com/ns/doc/xsl xs=~ xsl=~ xml=~' line='19'>
+     <fn role='name' name='local-name'>
+      <dot type='1NE'/>
+     </fn>
+     <gVarRef role='namespace' name='Q{}targetNS' bSlot='0'/>
+     <applyT role='content' line='20' flags='c' bSlot='-1'>
+      <sequence role='select'>
+       <axis name='attribute' nodeTest='NA'/>
+       <axis name='child' nodeTest='N u[NT,NE,NC,NP]'/>
+      </sequence>
+     </applyT>
+    </compElem>
+   </templateRule>
+  </mode>
+ </co>
+ <co id='1' binds=''>
+  <globalParam name='Q{}targetNS' as='1AS' line='14' module='file:/Users/cmarchand/devel/github/highligtJS-saxon-extension/src/main/xsl/top/marchand/xml/saxon/extension/highlight/namespace-changer.xsl' visibility='PUBLIC' flags='i'/>
+ </co>
+ <overridden/>
+ <output>
+  <property name='Q{http://saxon.sf.net/}stylesheet-version' value='30'/>
+ </output>
+ <decimalFormat/>
+</package>
+<?Σ 6847a9f?>

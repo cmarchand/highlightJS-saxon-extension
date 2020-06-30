@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description 
+  xmlns:x="http://www.jenitennison.com/xslt/xspec"
+  xmlns:html="http://www.w3.org/1999/xhtml"
+  xslt-version="3.0"
+  stylesheet="../../../../../../../../main/xsl/top/marchand/xml/saxon/extension/highlight/namespace-changer.xsl">
+  
+  <x:param name="targetNS" select="'http://www.w3.org/1999/xhtml'"/>
+  
+  <x:scenario label="simple change">
+    <x:context>
+      <wrapper>
+        <span class="hljs-tag">&lt;<span class="hljs-name">test</span>&gt;</span>value<span class="hljs-tag">&lt;/<span class="hljs-name">test</span>&gt;</span>
+      </wrapper>
+    </x:context>
+    <x:expect label="HTML namespace" xmlns="http://www.w3.org/1999/xhtml">
+      <wrapper>
+        <span class="hljs-tag">&lt;<span class="hljs-name">test</span>&gt;</span>value<span class="hljs-tag">&lt;/<span class="hljs-name">test</span>&gt;</span>
+      </wrapper>
+    </x:expect>
+  </x:scenario>
+</x:description>

@@ -45,6 +45,7 @@ public class HighlightExtensionTest {
     
     @Test
     public void useFunctionLoadedTest() throws Exception {
+        String expected = "<span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">test</span>&gt;</span>value<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">test</span>&gt;</span>";
         Configuration configuration = Configuration.newConfiguration();
         Processor proc = new Processor(configuration);
         proc.registerExtensionFunction(new HighlightExtension());
@@ -52,7 +53,7 @@ public class HighlightExtensionTest {
         comp.declareNamespace(HighlightExtension.EXT_PREFIX, HighlightExtension.EXT_NAMESPACE_URI);
         XPathSelector select = comp.compile("chm:highlight('xml','<test>value</test>')").load();
         XdmValue ret = select.evaluate();
-        System.out.println(ret.toString());
+        assertEquals(expected, ret.toString());
     }
     
 }

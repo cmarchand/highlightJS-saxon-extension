@@ -75,16 +75,27 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
                 if(parameters.length!=2) {
                     throw new XPathException(EXT_PREFIX+":"+EXT_FUNCTION_NAME+" requires 2 parameters: (language, sourceCode)");
                 }
-                String language = parameters[0].toString();
+                String language = parameters[0].head().getStringValue();
                 if(language.isEmpty()) {
                     throw new XPathException(EXT_PREFIX+":"+EXT_FUNCTION_NAME+" first parameter language must not be empty");
                 }
-                String sourceCode = parameters[1].toString();
-                Value obj = context.getBindings(JS).getMember("hljs");
-                Value function = obj.getMember("highlight");
-                return new StringValue(
-                        function.execute(language,sourceCode).getMember("value").asString()
-                );
+                String sourceCode = parameters[1].head().getStringValue();
+                try (Context context = Context.create()) {
+                    context.eval(
+                        Source.newBuilder(
+                                JS, 
+                                new InputStreamReader(getClass().getResourceAsStream(JS_RESOURCE)),
+                                "highlight.min.js"
+                        ).build()
+                    );
+                    Value obj = context.getBindings(JS).getMember("hljs");
+                    Value function = obj.getMember("highlight");
+                    return new StringValue(
+                            function.execute(language,sourceCode).getMember("value").asString()
+                    );
+                } catch(Exception ex) {
+                    throw new XPathException(ex);
+                }
             }
         };
     }

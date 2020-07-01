@@ -24,9 +24,13 @@ Then, declare this extension when creating `Processor` :
 Function's namespace is `top:marchand:xml:extfunctions`. You may use any prefix, but `chm` is commonly adopted.
 
 Then in XPath, function is available :
-```XPath
+```XQuery
   chm:highlight(language as xs:string, sourceCode as xs:string)
-  chm:highlight(language as xs:string, sourceCode as xs:string, config as map(xs:string,xs:string))
+  chm:highlight(
+      language as xs:string,
+      sourceCode as xs:string,
+      config as map(xs:string,xs:string)
+  )
 ```
 
 First form, with two parameters, generates an `item()*` sequence of `span` elements and `text()`, in `http://www.w3.org/1999/xhtml` namespace.

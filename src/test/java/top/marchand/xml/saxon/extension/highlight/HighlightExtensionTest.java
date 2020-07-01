@@ -10,8 +10,10 @@ import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XPathSelector;
+import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +50,6 @@ public class HighlightExtensionTest {
     
     @Test
     public void useFunctionLoadedXmlTest() throws Exception {
-        String expected = "<span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">test</span>&gt;</span>value<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">test</span>&gt;</span>";
         Configuration configuration = Configuration.newConfiguration();
         Processor proc = new Processor(configuration);
         proc.registerExtensionFunction(new HighlightExtension());
@@ -56,7 +57,28 @@ public class HighlightExtensionTest {
         comp.declareNamespace(HighlightExtension.EXT_PREFIX, HighlightExtension.EXT_NAMESPACE_URI);
         XPathSelector select = comp.compile("chm:highlight('xml','<test>value</test>')").load();
         XdmValue ret = select.evaluate();
-        assertEquals(expected, ret.toString());
+        assertEquals(3,ret.size());
+        XdmItem item = ret.itemAt(0);
+        assertTrue(item.isNode());
+        XdmNode node = (XdmNode)item;
+        assertEquals("span", node.getNodeName().getLocalName());
+        assertEquals(HighlightExtension.DEFAULT_RESULT_NAMESPACE, node.getNodeName().getNamespaceURI());
+    }
+    @Test
+    public void useFunctionLoadedXmlOtherNSTest() throws Exception {
+        Configuration configuration = Configuration.newConfiguration();
+        Processor proc = new Processor(configuration);
+        proc.registerExtensionFunction(new HighlightExtension());
+        XPathCompiler comp = proc.newXPathCompiler();
+        comp.declareNamespace(HighlightExtension.EXT_PREFIX, HighlightExtension.EXT_NAMESPACE_URI);
+        XPathSelector select = comp.compile("chm:highlight('xml','<test>value</test>',map{'result-ns':'top:marchand:xml'})").load();
+        XdmValue ret = select.evaluate();
+        assertEquals(3,ret.size());
+        XdmItem item = ret.itemAt(0);
+        assertTrue(item.isNode());
+        XdmNode node = (XdmNode)item;
+        assertEquals("span", node.getNodeName().getLocalName());
+        assertEquals("top:marchand:xml", node.getNodeName().getNamespaceURI());
     }
     
     @Test
@@ -73,12 +95,9 @@ public class HighlightExtensionTest {
                 "}";
         XPathSelector select = comp.compile("chm:highlight('java','"+javaCode+"')").load();
         XdmValue ret = select.evaluate();
-        // try to parse this
-        XdmNode node = proc.newDocumentBuilder().build(new StreamSource(new StringReader(wrap(ret.toString()))));
-        System.out.println(node.toString());
+        XdmNode node = (XdmNode)ret.itemAt(0);
+        assertEquals("span", node.getNodeName().getLocalName());
+        assertEquals(HighlightExtension.DEFAULT_RESULT_NAMESPACE, node.getNodeName().getNamespaceURI());
     }
     
-    private static String wrap(String content) {
-        return "<wrapper>"+content+"</wrapper>";
-    }
 }

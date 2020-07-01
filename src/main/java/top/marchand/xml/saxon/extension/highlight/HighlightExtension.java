@@ -7,16 +7,24 @@ package top.marchand.xml.saxon.extension.highlight;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import net.sf.saxon.expr.StaticProperty;
+import java.io.StringReader;
+import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.ma.map.HashTrieMap;
+import net.sf.saxon.ma.map.MapItem;
 import net.sf.saxon.ma.map.MapType;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.s9api.DocumentBuilder;
-import net.sf.saxon.type.ItemType;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XPathSelector;
+import net.sf.saxon.s9api.XdmDestination;
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltTransformer;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.value.AtomicValue;
@@ -43,8 +51,9 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
     public static final String JS = "js";
     
     private static final String JS_RESOURCE = "/top/marchand/xml/saxon/extension/highlight/highlight.min.js";
-    private static final String DEFAULT_RESULT_NAMESPACE = "http://www.w3.org/1999/xhtml";
+    public static final String DEFAULT_RESULT_NAMESPACE = "http://www.w3.org/1999/xhtml";
     public static final AtomicValue NAMESPACE_ENTRY = new StringValue("result-ns");
+    public static final QName PARAM_TARGET_NS = new QName("targetNS");
 
     private Context context;
     private Value function;
@@ -99,22 +108,39 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
                 String sourceCode = parameters[1].head().getStringValue();
                 String resultNamespace = DEFAULT_RESULT_NAMESPACE;
                 if(parameters.length==3) {
-                    HashTrieMap config = (HashTrieMap)parameters[2].head();
+                    MapItem config = (MapItem)parameters[2].head();
                     if(config.get(NAMESPACE_ENTRY)!=null) {
                         resultNamespace = config.get(NAMESPACE_ENTRY).getStringValue();
                     }
                 }
-                // TODO
-                return new StringValue(
-                        function.execute(language,sourceCode).getMember("value").asString()
-                );
+                
+                String escaped = function.execute(language,sourceCode).getMember("value").asString();
+                String wrapped = "<wrapper>"+escaped+"</wrapper>";
+                Processor proc = new Processor(xpc.getConfiguration());
+                try {
+                    XdmNode tree = proc.newDocumentBuilder().build(new StreamSource(new StringReader(wrapped)));
+                    XsltTransformer tr = proc.newXsltCompiler().compile(new StreamSource(getClass().getResourceAsStream("/top/marchand/xml/saxon/extension/highlight/namespace-changer.sef"))).load();
+                    tr.setInitialContextNode(tree);
+                    tr.setParameter(PARAM_TARGET_NS, XdmValue.makeValue(resultNamespace));
+                    XdmDestination xslResult = new XdmDestination();
+                    tr.setDestination(xslResult);
+                    tr.transform();
+                    XPathCompiler compiler = proc.newXPathCompiler();
+                    compiler.declareNamespace("h", resultNamespace);
+                    XPathSelector xs = compiler.compile("/h:wrapper/node()").load();
+                    xs.setContextItem(xslResult.getXdmNode());
+                    XdmValue ret = xs.evaluate();
+                    return ret.getUnderlyingValue();
+                } catch(SaxonApiException ex) {
+                    throw new XPathException(ex);
+                }
             }
         };
     }
 
     @Override
     public int getMaximumNumberOfArguments() {
-        return 2;
+        return 3;
     }
 
     @Override

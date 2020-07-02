@@ -6,7 +6,7 @@
   
   <groupId>top.marchand.xml.saxon.extension</groupId>
   <artifactId>highlight</artifactId>
-  <version>1.00.00</version>
+  <version>1.00.01</version>
   
   <name>Highlight JS Extension Function</name>
   <description>
@@ -16,6 +16,21 @@
     It requires Saxon 10 at least.
   </description>
   
+  <url>https://github.com/cmarchand/highligtJS-saxon-extension</url>
+  
+  <licenses>
+    <license>
+      <name>MPL 2.0</name>
+      <distribution>repo</distribution>
+      <url>https://www.mozilla.org/en-US/MPL/2.0/</url>
+    </license>
+  </licenses>
+  
+  <scm>
+    <developerConnection>git@github.com:cmarchand/highligtJS-saxon-extension.git</developerConnection>
+    <url>https://github.com/cmarchand/highligtJS-saxon-extension</url>
+  </scm>
+  
   <properties>
     <graalvm.version>20.1.0</graalvm.version>
     <highlight.js.version>10.1.1</highlight.js.version>
@@ -23,6 +38,18 @@
     <packageName>top/marchand/xml/saxon/extension/highlight</packageName>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  
+  <developers>
+    <developer>
+      <name>Christophe Marchand</name>
+      <email>christophe@marchand.top</email>
+      <url>https://github.com/cmarchand/</url>
+      <roles>
+        <role>Creator</role>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
   
   <dependencies>
     <dependency>
@@ -185,20 +212,6 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
             <version>1.6.7</version>
@@ -233,6 +246,20 @@
                 <phase>package</phase>
                 <goals>
                   <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
                 </goals>
               </execution>
             </executions>

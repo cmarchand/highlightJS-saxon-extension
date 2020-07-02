@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+  <code lang="java">
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -95,7 +98,7 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
         return new ExtensionFunctionCall() {
             @Override
             public Sequence call(XPathContext xpc, Sequence[] parameters) throws XPathException {
-                if(parameters.length<2) {
+                if(parameters.length&lt;2) {
                     throw new XPathException(EXT_PREFIX+":"+EXT_FUNCTION_NAME+" requires 2 parameters at least: (language as xs:string, sourceCode as xs:string, config as map()?)");
                 }
                 String language = parameters[0].head().getStringValue();
@@ -112,7 +115,7 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
                 }
                 
                 String escaped = function.execute(language,sourceCode).getMember("value").asString();
-                String wrapped = "<wrapper>"+escaped+"</wrapper>";
+                String wrapped = "&lt;wrapper&gt;"+escaped+"&lt;/wrapper&gt;";
                 Processor proc = new Processor(xpc.getConfiguration());
                 try {
                     XdmNode tree = proc.newDocumentBuilder().build(new StreamSource(new StringReader(wrapped)));
@@ -150,3 +153,102 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
         return true;
     }
 }
+  </code>
+  
+  <code lang="xml">
+    &lt;document&gt;
+      &lt;?pi attr=&quot;value&quot;?&gt;
+      &lt;!-- comment
+        on many lines --&gt;
+      &lt;data attr=&quot;other value
+        on two lines&quot;&gt;and some &lt;mixed&gt;content&lt;/mixed&gt; with text unformatted
+      &lt;/data&gt;
+    &lt;/document&gt;
+  </code>
+  
+  <code lang="javascript">
+'use strict';
+
+app.service('commonService', ['$http', function($http) {
+	
+	this.callHttpGet = function(url) {
+		return $http.get(url);
+	};
+	
+	this.callHttpPost = function(serviceUrl, requestBody, params) {
+		return $http.post(serviceUrl, requestBody, {
+			params : params ,
+			headers : {
+				'Content-Type' : 'application/json',
+				'Accept' : 'application/json'
+			}
+		});
+	};
+
+	this.callHttpPut = function(serviceUrl, requestBody, params) {
+		return $http.put(serviceUrl, requestBody, {
+			params : params ,
+			headers : {
+				'Content-Type' : 'application/json',
+				'Accept' : 'application/json'
+			}
+		});
+	};
+	
+	this.getDefinitionQueues = function() {
+		return this.callHttpGet('api/definitionQueues');
+	};
+
+	this.getExecutionQueues = function() {
+		return this.callHttpGet('api/executionQueues');
+	};
+
+} ]);    
+  </code>
+  <code lang="json">
+{
+  "flashId": "f8f35fb64-642b-4afd-847c-d4d18731fd73",
+  "version": "0.0",
+  "Entity Title": "Hidden Title",
+  "email": "christophe@marchand.top"
+}    
+  </code>
+  <code lang="css">
+.treatment-actions a {
+    font-size: 25px;
+    margin-left: 5px;
+}
+
+
+.highlight-modified {
+    background-color: yellow !important;
+}
+
+.nav-separator {
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.nav-separator > hr  {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-color: gray;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.tableCustomerHeader > th {
+    color: #007AFF !important;
+}
+
+.spanLegend li span {
+    padding: 10px;
+    line-height: 25px;
+    display: block;
+    float: left;
+    height: 25px;
+    margin-right: 10px;
+    width: 25px;
+}    
+  </code>
+</data>

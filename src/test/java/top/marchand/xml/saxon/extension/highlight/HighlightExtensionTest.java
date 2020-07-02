@@ -5,7 +5,8 @@
  */
 package top.marchand.xml.saxon.extension.highlight;
 
-import java.io.StringReader;
+import java.io.File;
+import java.io.FileInputStream;
 import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.Processor;
@@ -16,6 +17,7 @@ import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
+import net.sf.saxon.s9api.XsltTransformer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -63,6 +65,9 @@ public class HighlightExtensionTest {
         XdmNode node = (XdmNode)item;
         assertEquals("span", node.getNodeName().getLocalName());
         assertEquals(HighlightExtension.DEFAULT_RESULT_NAMESPACE, node.getNodeName().getNamespaceURI());
+        Serializer ser = proc.newSerializer(System.out);
+        ser.serializeXdmValue(ret);
+        ser.close();
     }
     @Test
     public void useFunctionLoadedXmlOtherNSTest() throws Exception {
@@ -100,4 +105,20 @@ public class HighlightExtensionTest {
         assertEquals(HighlightExtension.DEFAULT_RESULT_NAMESPACE, node.getNodeName().getNamespaceURI());
     }
     
+    @Test
+    public void transformXmlDocument() throws Exception {
+        Configuration configuration = Configuration.newConfiguration();
+        Processor proc = new Processor(configuration);
+        proc.registerExtensionFunction(new HighlightExtension());
+        XsltTransformer tr = proc.newXsltCompiler().compile(
+                new StreamSource(new FileInputStream("src/test/xsl/top/marchand/xml/saxon/extension/highlight/formater.xsl"))
+        ).load();
+        tr.setSource(new StreamSource(new FileInputStream("src/test/xml/top/marchand/xml/saxon/extension/highlight/source-code.xml")));
+        Serializer ser = proc.newSerializer(new File("result.html"));
+        ser.setOutputProperty(Serializer.Property.INDENT, "true");
+        ser.setOutputProperty(Serializer.Property.METHOD, "html");
+        tr.setDestination(ser);
+        tr.transform();
+        System.out.println("Open result.html in your browser...");
+    }
 }

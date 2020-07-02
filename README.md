@@ -9,7 +9,7 @@ To use this library, declare it as dependency :
   <dependency>
     <groupId>top.marchand.xml.saxon.extension</groupId>
     <artifactId>highlight</artifactId>
-    <version>1.00.00</version>
+    <version>1.00.01</version>
   </dependency>
 ```
 

@@ -49,7 +49,8 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
     };
     public static final String JS = "js";
     
-    private static final String JS_RESOURCE = "/top/marchand/xml/saxon/extension/highlight/highlight.min.js";
+    private static final String JS_RESOURCE_FILENAME = "highlight.pack.js";
+    private static final String JS_RESOURCE = "/top/marchand/xml/saxon/extension/highlight/"+JS_RESOURCE_FILENAME;
     public static final String DEFAULT_RESULT_NAMESPACE = "http://www.w3.org/1999/xhtml";
     public static final AtomicValue NAMESPACE_ENTRY = new StringValue("result-ns");
     public static final QName PARAM_TARGET_NS = new QName("targetNS");
@@ -65,7 +66,7 @@ public class HighlightExtension extends ExtensionFunctionDefinition {
                 Source.newBuilder(
                         JS, 
                         new InputStreamReader(getClass().getResourceAsStream(JS_RESOURCE)),
-                        "highlight.min.js"
+                        JS_RESOURCE_FILENAME
                 ).build()
             );
             Value obj = context.getBindings(JS).getMember("hljs");

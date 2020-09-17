@@ -6,7 +6,7 @@
   
   <groupId>top.marchand.xml.saxon.extension</groupId>
   <artifactId>highlight</artifactId>
-  <version>1.00.02-SNAPSHOT</version>
+  <version>1.01.00</version>
   
   <name>Highlight JS Extension Function</name>
   <description>

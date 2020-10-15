@@ -16,6 +16,7 @@ import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltTransformer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -120,5 +121,29 @@ public class HighlightExtensionTest {
         tr.setDestination(ser);
         tr.transform();
         System.out.println("Open result.html in your browser...");
+    }
+        
+    @Test
+    public void useFonctionLoadedCheckBracketOutsideCommentSpanTest() throws Exception {
+        Configuration configuration = Configuration.newConfiguration();
+        Processor proc = new Processor(configuration);
+        proc.registerExtensionFunction(new HighlightExtension());
+        XPathCompiler comp = proc.newXPathCompiler();
+        comp.declareNamespace(HighlightExtension.EXT_PREFIX, HighlightExtension.EXT_NAMESPACE_URI);
+        comp.declareNamespace("html", HighlightExtension.DEFAULT_RESULT_NAMESPACE);
+        String groovyCode = "pipeline {\n" +
+                "  /*\n" +
+                "   Multiline comment\n" +
+                "   inside pipeline\n" +
+                "  */\n" +
+                "  // single line comment\n" +
+                "}";
+        XPathSelector select = comp.compile("chm:highlight('groovy','"+groovyCode+"')").load();
+        XdmValue ret = select.evaluate();
+        assertEquals(5, ret.size(), "Expected 5 nodes in result");
+        XdmItem item = ret.itemAt(4);
+        assertTrue(item instanceof XdmNode);
+        assertEquals(XdmNodeKind.TEXT, ((XdmNode)item).getNodeKind(), "Expected a TEXT node");
+        assertEquals("}", item.toString().trim());
     }
 }

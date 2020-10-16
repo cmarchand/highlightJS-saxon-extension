@@ -131,7 +131,7 @@ public class HighlightExtensionTest {
         XPathCompiler comp = proc.newXPathCompiler();
         comp.declareNamespace(HighlightExtension.EXT_PREFIX, HighlightExtension.EXT_NAMESPACE_URI);
         comp.declareNamespace("html", HighlightExtension.DEFAULT_RESULT_NAMESPACE);
-        String groovyCode = "pipeline {\n" +
+        String groovyCode = "\npipeline {\n" +
                 "  /*\n" +
                 "   Multiline comment\n" +
                 "   inside pipeline\n" +
@@ -145,5 +145,38 @@ public class HighlightExtensionTest {
         assertTrue(item instanceof XdmNode);
         assertEquals(XdmNodeKind.TEXT, ((XdmNode)item).getNodeKind(), "Expected a TEXT node");
         assertEquals("}", item.toString().trim());
+    }
+    
+    @Test
+    public void codeStartingWithKeyWordTest() throws Exception {
+        Configuration configuration = Configuration.newConfiguration();
+        Processor proc = new Processor(configuration);
+        proc.registerExtensionFunction(new HighlightExtension());
+        XPathCompiler comp = proc.newXPathCompiler();
+        comp.declareNamespace(HighlightExtension.EXT_PREFIX, HighlightExtension.EXT_NAMESPACE_URI);
+        comp.declareNamespace("html", HighlightExtension.DEFAULT_RESULT_NAMESPACE);
+        String groovyCode = "@Library(''jenkinsPipelinesGroovyLibs@V1.2.7'')\n"+
+            "import fr.ca.cats.pipelines_libs.NpmHelper\n"+
+            "import fr.ca.cats.pipelines_libs.ReferentielVariablesHelper\n"+
+            "def referentielVariablesHelper = new ReferentielVariablesHelper(this)\n"+
+            "def variables = referentielVariablesHelper.getVariables()\n"+
+            "NpmHelper npm = new NpmHelper(this, variables)\n"+
+            "node(''agent-nodejs'') {\n"+
+            "  def nodeTool = tool ''nodejs-9''\n"+
+            "  def env = [\"NODE_HOME=${nodeTool}\",\n"+
+            "             \"PATH_NODE_HOME=${nodeTool}/bin\"]\n"+
+            "  withEnv(env) {\n"+
+            "    stage(''npm'') {\n"+
+            "     // here your npm invocations\n"+
+            "    }\n"+
+            "  }\n"+
+            "}";
+        XPathSelector select = comp.compile("chm:highlight('groovy','"+groovyCode+"')").load();
+        XdmValue ret = select.evaluate();
+        XdmItem item = ret.itemAt(0);
+        assertTrue(item instanceof XdmNode);
+        XdmNode node = (XdmNode)item;
+        assertEquals(XdmNodeKind.ELEMENT, node.getNodeKind(), "Expected an ELEMENT node");
+        assertEquals("span", node.getNodeName().getLocalName());
     }
 }
